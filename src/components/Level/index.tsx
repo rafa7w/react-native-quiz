@@ -61,7 +61,7 @@ export function Level({ title, type = 'EASY', isChecked = false, ...rest }: Prop
   }, [isChecked])
 
   return (
-    <Pressable 
+    <PressableAnimated 
       onPressIn={onPressIn}
       onPressOut={onPressOut}
       {...rest} 
@@ -75,6 +75,6 @@ export function Level({ title, type = 'EASY', isChecked = false, ...rest }: Prop
         }>
           {title}
         </Animated.Text>
-    </Pressable>
+    </PressableAnimated>
   );
 }
