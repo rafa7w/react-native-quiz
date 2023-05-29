@@ -31,6 +31,7 @@ const CARD_SKIP_AREA = (-200)
 export function Quiz() {
   const [points, setPoints] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [statusReply, setStatusReply] = useState(0)
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [quiz, setQuiz] = useState<QuizProps>({} as QuizProps);
   const [alternativeSelected, setAlternativeSelected] = useState<null | number>(null);
@@ -80,14 +81,15 @@ export function Quiz() {
     }
 
     if (quiz.questions[currentQuestion].correct === alternativeSelected) {
+      setStatusReply(1)
       setPoints(prevState => prevState + 1);
+      handleNextQuestion()
     } else {
+      setStatusReply(2)
       shakeAnimation()
     }
 
     setAlternativeSelected(null);
-
-    // handleNextQuestion()
   }
 
   function handleStop() {
@@ -109,7 +111,12 @@ export function Quiz() {
   function shakeAnimation() {
     shake.value = withSequence(
       withTiming(3, {duration: 400, easing: Easing.bounce}), 
-      withTiming(0)
+      withTiming(0, undefined, (finished) => {
+        'worklet';
+        if (finished) {
+          runOnJS(handleNextQuestion)()
+        }
+      })
     )
   }
 
@@ -200,7 +207,8 @@ export function Quiz() {
 
   return (
     <View style={styles.container}>
-      <OverlayFeedback status={0}/>
+      <OverlayFeedback status={statusReply}/>
+
       <Animated.View style={fixedProgressBarStyles}>
         <Text style={styles.title}>
           {quiz.title}
@@ -233,6 +241,7 @@ export function Quiz() {
               question={quiz.questions[currentQuestion]}
               alternativeSelected={alternativeSelected}
               setAlternativeSelected={setAlternativeSelected}
+              onUmount={() => setStatusReply(0)}
             />
           </Animated.View>
         </GestureDetector>
