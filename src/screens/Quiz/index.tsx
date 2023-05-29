@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, View, Text } from 'react-native';
+import { Alert, View, Text, BackHandler } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming, interpolate, Easing, useAnimatedScrollHandler, Extrapolate, runOnJS } from 'react-native-reanimated';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 
@@ -215,6 +215,16 @@ export function Quiz() {
       handleNextQuestion();
     }
   }, [points]);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleStop)
+
+    // sempre quando se usa um Listener é important usar a função de retorno do useEffect para remover esse Listener
+
+    return () => backHandler.remove()
+
+
+  }, [])
 
   if (isLoading) {
     return <Loading />
